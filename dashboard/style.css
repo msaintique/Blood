@@ -1,0 +1,328 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+header {
+    background-color: #bb020b;
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    width: 100%;
+    z-index: 1000; /* Ensure it's above other content */
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    height: 80px;
+    width: auto;
+    margin-right: 20px; /* Adjust as needed */
+}
+
+h1 {
+    font-size: 24px;
+    margin: 0;
+    flex-grow: 1;
+    color: #f3f1f1;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #f3f1f1;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    color: #007bff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .logo {
+        margin: 10px 0;
+    }
+
+    nav ul {
+        margin-top: 10px;
+    }
+
+    nav ul li {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-container .logo {
+        height: 40px; /* Adjust as needed for smaller screens */
+    }
+}
+
+
+.hero {
+    position: relative;
+    background: url('image/rbc1.jpeg') no-repeat center center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    width: 1359px;
+    margin-left: -30px;
+    height: 640px;
+    
+}
+.hero-text {
+    position: relative;
+
+    z-index: 2;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(66, 27, 27, 0.5);
+    z-index: 1;
+}
+
+h2 {
+    font-size: 40px;
+    margin-top:80px;
+}
+
+p {
+    font-size: 24px;
+    margin-top: 20px;
+   
+}
+
+main {
+    padding: 20px;
+}
+
+
+#about {
+    padding: 50px 10px;
+    background-color: #e0c8c8;
+    width: 1359px;
+    margin-left: -30px;
+    height: 640px;
+}
+
+.about-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    
+}
+
+.about-image {
+    flex:0.8;
+    padding-right: 20px; /* Add padding to create space between image and text */
+}
+
+.about-image img {
+    max-width: 100%;
+    margin-top: 10px;
+    height:300px;
+    display: block;
+}
+
+.about-text {
+    flex: 1;
+}
+
+.about-text h2 {
+    font-size: 30px;
+    color: black;
+    margin-top: 13; /* Remove default margin */
+}
+
+.about-text p {
+    color: rgb(20, 19, 19);
+    font-size: 20px;
+    margin-top: 20px; /* Add some space between heading and paragraph */
+    
+}
+
+
+#who-should-donate {
+    padding: 50px;
+    background-color: #fddcde82;
+    width: 1359px;
+    margin-left: -30px;
+    height: 640px;
+}
+
+#who-should-donate h2 {
+    color:black;
+    font-size:30px;
+    margin-bottom: 20px;
+}
+
+#who-should-donate p {
+    color: rgb(20, 19, 19);
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+#who-should-donate ul {
+    list-style-type: disc;
+    margin-left: 400px;
+}
+
+#who-should-donate li {
+    color: #5a5959;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+#who-should-donate a {
+    color: #333;
+    text-decoration: none;
+}
+
+#who-should-donate a:hover {
+    text-decoration: underline;
+}
+#contact {
+    padding: 50px 10px;
+    background-color:#f3f6fa;
+    width: 1359px;
+    margin-left: -30px;
+}
+#contact .container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+#contact h2 {
+    color: black;
+    font-size: 30px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+#contact .form-control {
+    border-radius: 5px;
+}
+#contact .btn-primary {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+#contact .btn-primary:hover,
+#contact .btn-primary:focus,
+#contact .btn-primary:active {
+    background-color: #c82333;
+    border-color: #bd2130;
+    color: white;
+}
+#profile {
+    padding: 50px 10px;
+    background-color: #f8f9fa;
+    width: 1359px;
+    margin-left: -30px;
+}
+
+.section-heading {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.section-heading h2 {
+    font-size: 25px;
+    color: #333;
+}
+
+
+
+.main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+}
+
+
+.footer {
+    background-color: #333;
+    color: #fff;
+    padding: 50px 0;
+}
+
+.footer h4 {
+    color: #fff;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.footer ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.footer ul li {
+    margin-bottom: 10px;
+}
+
+.footer ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.footer ul li a:hover {
+    text-decoration: underline;
+}
+
+.footer p {
+    margin-bottom: 0;
+    font-size: 14px;
+}
+
+.social-icons {
+    list-style-type: none;
+    padding: 0;
+}
+
+.social-icons li {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.social-icons li a {
+    color: #fff;
+    font-size: 20px;
+}
+
+.social-icons li a:hover {
+    color: #f0f0f0;
+}
