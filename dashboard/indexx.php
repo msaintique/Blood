@@ -1,40 +1,17 @@
 <?php
 include 'dbconnect.php';
-include 'intouchsms.php'; // Assuming this is the file where you have the SMS sending logic
+$user_count_result = mysqli_query($conn, "SELECT COUNT(*) AS count FROM users");
+$user_count = mysqli_fetch_assoc($user_count_result)['count'];
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['approve_appointment'])) {
-    $appointment_id = mysqli_real_escape_string($conn, $_POST['appointment_id']);
-    $donation_center = mysqli_real_escape_string($conn, $_POST['donation_center']);
-    
-    // Update the appointment status to approved
-    $sql = "UPDATE appointments SET status = 'approved', donation_center = '$donation_center' WHERE id = $appointment_id";
-    
-    if (mysqli_query($conn, $sql)) {
-        // Fetch the appointment details
-        $result = mysqli_query($conn, "SELECT * FROM appointments WHERE id = $appointment_id");
-        $appointment = mysqli_fetch_assoc($result);
+// Fetch number of messages sent
+$message_count_result = mysqli_query($conn, "SELECT COUNT(*) AS count FROM contact_messages");
+$message_count = mysqli_fetch_assoc($message_count_result)['count'];
+// Fetch number of appointment requests
+$appointment_count_result = mysqli_query($conn, "SELECT COUNT(*) AS count FROM appointments");
+$appointment_count = mysqli_fetch_assoc($appointment_count_result)['count'];
 
-        // Prepare the SMS message
-        $message = "Thank you, " . $appointment['first_name'] . " " . $appointment['last_name'] . 
-                   ". Your blood donation appointment is approved. Please visit " . $donation_center . 
-                   " on " . $appointment['appointment_date'] . " at " . $appointment['appointment_time'] . 
-                   ". Thank you for your contribution.";
-
-        // Send the SMS
-        $sms_response = send_sms($appointment['phone_number'], $message);
-
-        if ($sms_response) {
-            echo "Appointment approved and SMS sent successfully.";
-        } else {
-            echo "Appointment approved but SMS sending failed.";
-        }
-    } else {
-        echo "Error approving appointment: " . mysqli_error($conn);
-    }
-}
-
-// Close the database connection
 mysqli_close($conn);
+?>
 ?>
 
 <!DOCTYPE html>
@@ -43,7 +20,7 @@ mysqli_close($conn);
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blood Donation Platform - Admin Dashboard</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-xxxxxx" crossorigin="anonymous" />
+  <link rel=" https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
@@ -80,7 +57,7 @@ mysqli_close($conn);
   <!-- Sidebar -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="indexx.php" class="brand-link">
-      <img src="dist/img/AdminLTELogo.png" alt="Admin Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <img src="image/giving2.jpg" alt="Admin Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-light">Blood Donation</span>
     </a>
     <div class="sidebar">
@@ -110,6 +87,14 @@ mysqli_close($conn);
                 <p>Requests Appointments</p>
             </a>
           </li>
+          <li class="nav-item">
+          <a href="#" class="nav-link" onclick="generateReport()">
+          <i class="nav-icon far fa-file-excel"></i>
+          <p> Reports</p>
+  </a>
+</li>
+
+
         </ul>
       </nav>
     </div>
@@ -144,6 +129,9 @@ mysqli_close($conn);
   $(document).ready(function() {
     loadContent('admin_dashboard.php');
   });
+
+
+
 </script>
 </body>
 </html>

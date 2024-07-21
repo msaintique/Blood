@@ -1,63 +1,111 @@
 <?php
-include 'dbconnect.php'; // Include your database connection file
+require_once __DIR__ . '/vendor/autoload.php'; // Use Composer autoload
+include 'dbconnect.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id = mysqli_real_escape_string($conn, $_POST['id']);
-    $action = mysqli_real_escape_string($conn, $_POST['action']);
-    
-    // Get appointment details
-    $sql = "SELECT * FROM appointments WHERE id = '$id'";
-    $result = mysqli_query($conn, $sql);
-    $appointment = mysqli_fetch_assoc($result);
+header('Content-Type: application/json'); // Set content type for JSON responses
 
-    if ($appointment) {
-        $status = $action == 'approve' ? 'Approved' : 'Rejected';
+$response = [];
 
-        // Update appointment status
-        $update_sql = "UPDATE appointments SET status = '$status' WHERE id = '$id'";
-        if (mysqli_query($conn, $update_sql)) {
-            if ($action == 'approve') {
-                // Send SMS notification
-                sendSMS($appointment['phone_number'], "Your appointment is approved. Please visit us on " . $appointment['appointment_date'] . " at " . $appointment['appointment_time'] . ".");
+function formatPhoneNumber($phone) {
+    // Ensure the phone number has the country code prefix
+    if (strpos($phone, '+') !== 0) {
+        return '+250' . ltrim($phone, '0'); // Assuming the country code is +250 (Rwanda)
+    }
+    return $phone;
+}
 
-                echo "Appointment has been " . strtolower($status) . " and SMS sent.";
+if (isset($_POST['approve_appointment'])) {
+    $id = $_POST['id'];
+    $donation_center = $_POST['donation_center'];
+    $appointment_date = $_POST['appointment_date'];
+    $appointment_time = $_POST['appointment_time'];
+
+    // Update the appointment with the new details
+    $query = "UPDATE appointments SET status='approved', donation_center=?, appointment_date=?, appointment_time=? WHERE id=?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("sssi", $donation_center, $appointment_date, $appointment_time, $id);
+
+    if ($stmt->execute()) {
+        // Fetch phone number
+        $query = "SELECT phone_number FROM appointments WHERE id=?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $appointment = $result->fetch_assoc();
+
+        $phone_number = formatPhoneNumber($appointment['phone_number']); // Format the phone number
+
+        // Create the message
+        $message = "Thank you for scheduling an appointment to donate blood. Your appointment is on $appointment_date at $appointment_time. Please visit the donation center at $donation_center.";
+
+        // Send SMS via Infobip API
+        $apiKey = '5299f1afb7369919c07460e27546a77b-6b192be2-5d16-459d-86f6-f7f5478a4203';
+        $apiUrl = 'https://j3lr8v.api.infobip.com/sms/2/text/advanced';
+
+        $smsData = [
+            'messages' => [
+                [
+                    'destinations' => [
+                        ['to' => $phone_number]
+                    ],
+                    'from' => 'Blood Donation',
+                    'text' => $message
+                ]
+            ]
+        ];
+
+        $request = new HTTP_Request2();
+        $request->setUrl($apiUrl);
+        $request->setMethod(HTTP_Request2::METHOD_POST);
+        $request->setConfig(['follow_redirects' => TRUE]);
+        $request->setHeader([
+            'Authorization' => 'App ' . $apiKey,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
+        ]);
+        $request->setBody(json_encode($smsData));
+
+        try {
+            $infobipResponse = $request->send();
+            $responseBody = $infobipResponse->getBody();
+            $responseStatus = $infobipResponse->getStatus();
+            
+            if ($responseStatus == 200) {
+                $response['message'] = "Appointment approved and SMS sent.";
             } else {
-                echo "Appointment has been " . strtolower($status) . ".";
+                $response['message'] = 'Unexpected HTTP status: ' . $responseStatus . ' ' . $infobipResponse->getReasonPhrase();
+                $response['error'] = $responseBody;
             }
-        } else {
-            echo "Error updating appointment: " . mysqli_error($conn);
+        } catch (HTTP_Request2_Exception $e) {
+            $response['message'] = 'Error: ' . $e->getMessage();
         }
     } else {
-        echo "Appointment not found.";
+        $response['message'] = "Failed to approve appointment: " . $stmt->error;
     }
 
-    mysqli_close($conn);
+    $stmt->close();
 }
-function sendSMS($phone_number, $message) {
-    $url = "https://www.intouchsms.co.rw";
-    $fields = array(
-        'sender' => '+250780798099',  // Replace with your actual sender ID
-        'recipients' => $phone_number,
-        'message' => $message
-    );
 
-    $headers = array(
-        'Content-Type: application/json',
-        'Authorization: a49131f101b9b7f413a60e73e335e5356370d56f6'  // Replace with your Intouch SMS API key
-    );
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+if (isset($_POST['reject_appointment'])) {
+    $id = $_POST['id'];
 
-    $response = curl_exec($ch);
-    if ($response === false) {
-        echo 'Curl error: ' . curl_error($ch);
+    // Reject the appointment
+    $query = "UPDATE appointments SET status='rejected' WHERE id=?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $id);
+
+    if ($stmt->execute()) {
+        $response['message'] = "Appointment rejected.";
     } else {
-        echo 'Message sent successfully!';
+        $response['message'] = "Failed to reject appointment: " . $stmt->error;
     }
-    curl_close($ch);
+
+    $stmt->close();
 }
+
+mysqli_close($conn);
+
+// Ensure the response is properly encoded as JSON
+echo json_encode($response);
 ?>

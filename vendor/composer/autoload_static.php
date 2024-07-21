@@ -9,27 +9,31 @@ class ComposerStaticInitf1cf9469967b349ab5a5bb9118a35f1f
     public static $prefixLengthsPsr4 = array (
         'S' => 
         array (
-            'Saintique\\Blood\\' => 16,
-        ),
-        'P' => 
-        array (
-            'PHPMailer\\PHPMailer\\' => 20,
+            'Saintique\\Dashboard\\' => 20,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Saintique\\Blood\\' => 
+        'Saintique\\Dashboard\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),
-        'PHPMailer\\PHPMailer\\' => 
+    );
+
+    public static $prefixesPsr0 = array (
+        'H' => 
         array (
-            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+            'HTTP_Request2' => 
+            array (
+                0 => __DIR__ . '/..' . '/pear/http_request2',
+            ),
         ),
     );
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'Net_URL2' => __DIR__ . '/..' . '/pear/net_url2/Net/URL2.php',
+        'PEAR_Exception' => __DIR__ . '/..' . '/pear/pear_exception/PEAR/Exception.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
@@ -37,6 +41,7 @@ class ComposerStaticInitf1cf9469967b349ab5a5bb9118a35f1f
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitf1cf9469967b349ab5a5bb9118a35f1f::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitf1cf9469967b349ab5a5bb9118a35f1f::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitf1cf9469967b349ab5a5bb9118a35f1f::$prefixesPsr0;
             $loader->classMap = ComposerStaticInitf1cf9469967b349ab5a5bb9118a35f1f::$classMap;
 
         }, null, ClassLoader::class);

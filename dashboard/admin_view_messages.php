@@ -1,62 +1,72 @@
 <?php
-include 'dbconnect.php'; // Include your database connection file
+include 'dbconnect.php';
 
-$sql = "SELECT * FROM appointments WHERE status = 'Pending'";
-$result = mysqli_query($conn, $sql);
+// Fetch all messages
+$result = mysqli_query($conn, "SELECT id, name, email, message FROM contact_messages");
+
+// Check if there was an error in executing the query
+if (!$result) {
+    die("Error in SQL query: " . mysqli_error($conn));
+}
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Appointment Requests</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>View Messages</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-xxxxxx" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
 </head>
-<body>
-<div class="container mt-5">
-    <h4>Appointment Requests</h4>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Blood Type</th>
-                <th>Location</th>
-                <th>Appointment Date</th>
-                <th>Appointment Time</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($row = mysqli_fetch_assoc($result)): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($row['first_name']) . ' ' . htmlspecialchars($row['last_name']); ?></td>
-                    <td><?php echo htmlspecialchars($row['email']); ?></td>
-                    <td><?php echo htmlspecialchars($row['blood_type']); ?></td>
-                    <td><?php echo htmlspecialchars($row['location']); ?></td>
-                    <td><?php echo htmlspecialchars($row['appointment_date']); ?></td>
-                    <td><?php echo htmlspecialchars($row['appointment_time']); ?></td>
-                    <td>
-                        <form action="process_appointment.php" method="POST" style="display:inline;">
-                            <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
-                            <input type="hidden" name="action" value="approve">
-                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                        </form>
-                        <form action="process_appointment.php" method="POST" style="display:inline;">
-                            <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
-                            <input type="hidden" name="action" value="reject">
-                            <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-                        </form>
-                    </td>
-                </tr>
-            <?php endwhile; ?>
-        </tbody>
-    </table>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Messages</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="container-fluid">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Message</th>
+                            <!-- <th>Date Sent</th> Remove this line -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while($row = mysqli_fetch_assoc($result)): ?>
+                        <tr>
+                            <td><?php echo $row['id']; ?></td>
+                            <td><?php echo $row['name']; ?></td>
+                            <td><?php echo $row['email']; ?></td>
+                            <td><?php echo $row['message']; ?></td>
+                            <!-- <td><?php // echo $row['date_sent']; ?></td> Remove this line -->
+                        </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+<script src="plugins/jquery/jquery.min.js"></script>
+<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+<script src="dist/js/adminlte.min.js"></script>
 </body>
 </html>
-
-<?php
-mysqli_close($conn);
-?>
