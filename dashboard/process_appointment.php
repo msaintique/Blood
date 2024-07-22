@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/vendor/autoload.php'; // Use Composer autoload
+include '../vendor/autoload.php'; // Use Composer autoload
 include 'dbconnect.php';
 
 header('Content-Type: application/json'); // Set content type for JSON responses

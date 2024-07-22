@@ -6,12 +6,12 @@ $user_count = mysqli_fetch_assoc($user_count_result)['count'];
 // Fetch number of messages sent
 $message_count_result = mysqli_query($conn, "SELECT COUNT(*) AS count FROM contact_messages");
 $message_count = mysqli_fetch_assoc($message_count_result)['count'];
+
 // Fetch number of appointment requests
 $appointment_count_result = mysqli_query($conn, "SELECT COUNT(*) AS count FROM appointments");
 $appointment_count = mysqli_fetch_assoc($appointment_count_result)['count'];
 
 mysqli_close($conn);
-?>
 ?>
 
 <!DOCTYPE html>
@@ -20,7 +20,7 @@ mysqli_close($conn);
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blood Donation Platform - Admin Dashboard</title>
-  <link rel=" https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
@@ -88,13 +88,11 @@ mysqli_close($conn);
             </a>
           </li>
           <li class="nav-item">
-          <a href="#" class="nav-link" onclick="generateReport()">
-          <i class="nav-icon far fa-file-excel"></i>
-          <p> Reports</p>
-  </a>
-</li>
-
-
+            <a href="#" class="nav-link" onclick="generateReport()">
+              <i class="nav-icon far fa-file-excel"></i>
+              <p>Generate Report</p>
+            </a>
+          </li>
         </ul>
       </nav>
     </div>
@@ -126,11 +124,86 @@ mysqli_close($conn);
       }
     });
   }
-  $(document).ready(function() {
-    loadContent('admin_dashboard.php');
-  });
 
+  function generateReport() {
+    $.ajax({
+      url: 'generate_report.php',
+      type: 'GET',
+      success: function(data) {
+        let report = JSON.parse(data);
+        let html = '<h2>Appointments Report</h2>';
 
+        if (report.error) {
+          html += '<div class="alert alert-danger">Error: ' + report.error + '</div>';
+        } else {
+          html += '<h3>Approved Appointments</h3>';
+          html += generateTable(report.approved);
+          html += '<h3>Pending Appointments</h3>';
+          html += generateTable(report.pending);
+          html += '<h3>Rejected Appointments</h3>';
+          html += generateTable(report.rejected);
+        }
+
+        $('#dashboard-content').html(html);
+      },
+      error: function(xhr, status, error) {
+        console.error('Error generating report:', error);
+      }
+    });
+  }
+  function generateReport() {
+    $.ajax({
+        url: 'generate_report.php',
+        type: 'GET',
+        success: function(data) {
+            let report = JSON.parse(data);
+            let html = '<h2>Appointments Report</h2>';
+
+            if (report.error) {
+                html += '<div class="alert alert-danger">Error: ' + report.error + '</div>';
+            } else {
+                html += '<h3>Approved Appointments</h3>';
+                html += generateTable(report.approved);
+                html += '<h3>Pending Appointments</h3>';
+                html += generateTable(report.pending);
+                html += '<h3>Rejected Appointments</h3>';
+                html += generateTable(report.rejected);
+                html += '<button onclick="downloadReport()">Download Report</button>';
+            }
+
+            $('#dashboard-content').html(html);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error generating report:', error);
+        }
+    });
+}
+
+function generateTable(data) {
+    let html = '<table class="table table-bordered">';
+    html += '<thead><tr><th>ID</th><th>Name</th><th>Phone Number</th><th>Blood Type</th><th>Appointment Date</th><th>Appointment Time</th><th>Donation Center</th><th>Status</th></tr></thead>';
+    html += '<tbody>';
+
+    data.forEach(function(item) {
+        html += '<tr>';
+        html += '<td>' + item.id + '</td>';
+        html += '<td>' + item.first_name + ' ' + item.last_name + '</td>';
+        html += '<td>' + item.phone_number + '</td>';
+        html += '<td>' + item.blood_type + '</td>';
+        html += '<td>' + item.appointment_date + '</td>';
+        html += '<td>' + item.appointment_time + '</td>';
+        html += '<td>' + item.donation_center + '</td>';
+        html += '<td class="' + 'status-' + item.status + '">' + item.status + '</td>';
+        html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    return html;
+}
+
+function downloadReport() {
+    window.location.href = 'download_report.php';
+}
 
 </script>
 </body>
